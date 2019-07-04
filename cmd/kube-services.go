@@ -48,7 +48,17 @@ var kubeServicesCmd = &cobra.Command{
 
 		for i := 0; i < len(services.Items); i++ {
 
-			fmt.Printf("ServiceName: %s \n", services.Items[i].ObjectMeta.Name)
+			name := services.Items[i].ObjectMeta.Name
+			namespace = services.Items[i].ObjectMeta.Namespace
+			spec := services.Items[i].Spec
+			ip := "undefined"
+			if spec.Type == "ClusterIP" {
+				ip = spec.ClusterIP
+			}
+
+			fmt.Printf("Service Name: %s  Namespace: %s IP: %s\n", name, namespace, ip)
+			//fmt.Printf("Service status %s\n", spec)
+
 		}
 
 		fmt.Printf("Kube test config file  %s\n", cubeConfig)
