@@ -4,14 +4,20 @@ import (
 	"fmt"
 	"github.com/spf13/cobra"
 	//"k8s.io/apimachinery/pkg/api/errors"
-	corev1 "k8s.io/api/core/v1"
+	//corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	//"time"
 )
 
+var (
+	namespace string = ""
+)
+
 func init() {
+
+	kubeServicesCmd.Flags().StringVar(&namespace, "namespace", "", "limit serices by namespace")
 
 	RootCmd.AddCommand(kubeServicesCmd)
 
@@ -38,16 +44,11 @@ var kubeServicesCmd = &cobra.Command{
 		if err != nil {
 			panic(err.Error())
 		}
-		nodes, err := clientset.CoreV1().Nodes().List(metav1.ListOptions{})
+		services, err := clientset.CoreV1().Services(namespace).List(metav1.ListOptions{})
 
-		nodeip := []corev1.NodeAddress{}
-		conditions := []corev1.NodeCondition{}
-		for i := 0; i < len(nodes.Items); i++ {
-			nodeip = nodes.Items[i].Status.Addresses
-			conditions = nodes.Items[i].Status.Conditions
+		for i := 0; i < len(services.Items); i++ {
 
-			fmt.Printf("NodeIp: %s NodeName: %s\n", nodeip[0].Address, nodeip[1].Address)
-			fmt.Printf("Conditions: %s \n", conditions)
+			fmt.Printf("ServiceName: %s \n", services.Items[i].ObjectMeta.Name)
 		}
 
 		fmt.Printf("Kube test config file  %s\n", cubeConfig)
